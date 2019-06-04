@@ -1,4 +1,5 @@
-##　说明
+
+## 说明
 
 > 该project使用python2.7.16，django1.11.21
 前端使用X-admin
