@@ -27,7 +27,7 @@
                 <label for="L_repass" class="layui-form-label">
                     <span class="x-red">*</span>系统ID</label>
                 <div class="layui-input-inline">
-                    <input type="text" id="sql_id" name="sql_id" required="" lay-verify="sql_id"
+                    <input type="text" id="sql_id" name="sql_id" lay-verify="required|number"
                            autocomplete="off" class="layui-input">
                 </div>
             </div>
@@ -35,7 +35,7 @@
                 <label for="L_repass" class="layui-form-label">
                     <span class="x-red">*</span>英文名</label>
                 <div class="layui-input-inline">
-                    <input type="text" id="enname" name="enname" required="" lay-verify="enname"
+                    <input type="text" id="enname" name="enname" required="" lay-verify="required"
                            autocomplete="off" class="layui-input">
                 </div>
             </div>
@@ -43,7 +43,7 @@
                 <label for="L_repass" class="layui-form-label">
                     <span class="x-red">*</span>中文名</label>
                 <div class="layui-input-inline">
-                    <input type="text" id="cnname" name="cnname" required="" lay-verify="cnname"
+                    <input type="text" id="cnname" name="cnname" required="" lay-verify="required"
                            autocomplete="off" class="layui-input">
                 </div>
             </div>
@@ -59,7 +59,6 @@
         $ = layui.jquery;
         var form = layui.form,
             layer = layui.layer;
-
 
         //监听提交
         form.on('submit(add)',
@@ -80,8 +79,9 @@
                     data: dict,
                     success: function (data) {
                         console.log(data);
-                        layer.alert("增加成功", {
-                                icon: 6
+                        layer.msg("增加成功", {
+                                icon: 1,
+                                time: 1000
                             },
                             function () {
                                 //关闭当前frame

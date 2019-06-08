@@ -83,8 +83,9 @@
                     data: dict,
                     success: function (data) {
                         console.log(data);
-                        layer.alert("修改成功", {
-                                icon: 6
+                        layer.msg("修改成功", {
+                                icon: 6,
+                                time: 1000,
                             },
                             function () {
                                 //关闭当前frame

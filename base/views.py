@@ -1,20 +1,45 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+import json
+
+from django.contrib import auth
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponse
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
+
 from base.models import System
 
 
 # Create your views here.
 
-@csrf_exempt
-def login(request):
+def redirect(request):
     return render(request, "login.html")
 
 
+@csrf_exempt
+def login(request):
+    print(request.method)
+    if request.method == 'POST':
+        username = request.POST.get('username', '')
+        password = request.POST.get('password', '')
+        user = auth.authenticate(username=username, password=password)
+        if user is not None:
+            auth.login(request, user)
+            request.session["user"] = username
+            # response = HttpResponseRedirect('/index/')
+            return HttpResponse("OK")
+        else:
+            return render(request, "login.html", {"error": "用户名或密码错误"})
+    if request.method == 'GET':
+        return render(request, "login.html")
+
+
+@login_required
 def index(request):
-    return render(request, "index.html")
+    username = request.session.get("user", "")
+    return render(request, "index.html", {"user": username})
 
 
 def member_list(request):
@@ -73,7 +98,13 @@ def member_search(request):
     if request.method == "POST":
         name = request.POST.get("cnname", None)
         if name != None:
-            result = System.objects.filter(cnname=name).all()
+            result = list(System.objects.filter(cnname=name).all().values())
             print(result)
-            return render(request, "search_result.html", {"list": result})
+            # result = list(result)
+            print(type(result), result)
+            # a = [item for item in result]
+            # return HttpResponse(result)
+            return HttpResponse(json.dumps({'result': result}), content_type="application/json")
+            # result = System.objects.filter(cnname=name).all()
+            # return render(request, "search_result.html", {"list": result})
     # return render(request, "error.html")

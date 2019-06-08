@@ -6,8 +6,8 @@
     <title>欢迎页面-X-admin2.2</title>
     <meta name="renderer" content="webkit">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <meta name="viewport"
-          content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi"/>
+    {#    <meta name="viewport"#}
+    {#          content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi"/>#}
     <link rel="stylesheet" href="{% static '/css/font.css' %}">
     <link rel="stylesheet" href="{% static '/css/xadmin.css' %}">
     <script src="{% static '/lib/layui/layui.js' %}" charset="utf-8"></script>
@@ -40,14 +40,14 @@
                                    class="layui-input">
                         </div>
                         <div class="layui-inline layui-show-xs-block">
-                            <button class="layui-btn" lay-submit="" lay-filter="sreach" onclick="member_search()"><i
-                                    class="layui-icon">&#xe615;</i></button>
+                            <div style="width: 20px; height: 20px; background: #000" onclick="member_search()"><i>&#xe615;</i>
+                            </div>
                         </div>
                     </form>
                 </div>
                 <div class="layui-card-header">
-                    <button class="layui-btn layui-btn-danger" onclick="delAll()"><i class="layui-icon"></i>批量删除
-                    </button>
+                    {#                    <button class="layui-btn layui-btn-danger" onclick="delAll()"><i class="layui-icon"></i>批量删除#}
+                    {#                    </button>#}
                     <button class="layui-btn" onclick="xadmin.open('添加用户','/member_add',600,400)"><i
                             class="layui-icon"></i>添加
                     </button>
@@ -56,9 +56,9 @@
                     <table class="layui-table layui-form">
                         <thead>
                         <tr>
-                            <th>
-                                <input type="checkbox" lay-filter="checkall" name="" lay-skin="primary">
-                            </th>
+                            {#                            <th>#}
+                            {#                                <input type="checkbox" lay-filter="checkall" name="" lay-skin="primary">#}
+                            {#                            </th>#}
                             <th>ID</th>
                             <th>系统ID</th>
                             <th>中文名</th>
@@ -69,9 +69,9 @@
                         <tbody>
                         {% for i in list %}
                             <tr>
-                                <td>
-                                    <input type="checkbox" name="id" value="1" lay-skin="primary">
-                                </td>
+                                {#                                <td>#}
+                                {#                                    <input type="checkbox" name="id" value="1" lay-skin="primary">#}
+                                {#                                </td>#}
                                 <td id="id">{{ i.id }}</td>
                                 <td>{{ i.sql_id }}</td>
                                 <td>{{ i.cnname }}</td>
@@ -99,8 +99,8 @@
 </div>
 </body>
 <script>
-    layui.use(['laydate', 'form'], function () {
-        var laydate = layui.laydate;
+    layui.use(['layer', 'form'], function () {
+        var layer = layui.layer;
         var form = layui.form;
 
 
@@ -114,18 +114,6 @@
             }
             form.render('checkbox');
         });
-
-        //执行一个laydate实例
-        laydate.render({
-            elem: '#start' //指定元素
-        });
-
-        //执行一个laydate实例
-        laydate.render({
-            elem: '#end' //指定元素
-        });
-
-
     });
 
     /*用户-搜索*/
@@ -136,27 +124,29 @@
             type: "POST",
             data: {"cnname": keyword},
             success: function (data) {
-                layer.msg("搜索完成", {icon: 1});
-            },
-            error: function (jqXHR, textStatus, err) {
-                console.log(arguments);
-            },
-
-            complete: function (jqXHR, textStatus) {
-                console.log(textStatus);
-            },
-
-            statusCode: {
-                '403': function (jqXHR, textStatus, err) {
-                    console.log(arguments);
-                },
-
-                '400': function (jqXHR, textStatus, err) {
-                    console.log(arguments);
+                if (data.result != "") {
+                    console.log(data)
+                    $('tbody tr').remove();
+                    $.each(data.result, function (index, item) {
+                        db = data.result;
+                        if (db != "") {
+                            $('tbody').html("<tr><td>" + db[index]["id"] + "</td><td>" + db[index]["sql_id"] + "</td><td>"
+                                + db[index]["cnname"] + "</td><td>" + db[index]["enname"] + "</td><td class=\"td-manage\">" +
+                                "<a title=\"编辑\" onclick=\"xadmin.open('编辑','/member_edit/" + db[index]['id'] + "',500,400)\" " +
+                                "href=\"javascript:;\"><button  type=\"button\" class=\"layui-btn\"><i class=\"layui-icon\">" +
+                                "</i></button></a><a title=\"删除\" onclick=\"member_del(this," + db[index]["id"] + ")\" href=\"javascript:;\">" +
+                                "<button type=\"button\" class=\"layui-btn layui-btn-danger\"><i class=\"layui-icon\"></i></button></a></td></tr>");
+                        }
+                    })
+                } else {
+                    {#alert("数据为空");#}
+                    $('tbody tr').remove();
+                    layer.msg("没有查到数据", {icon: 2, time: 1000});
                 }
             }
+            ,
         })
-    }
+    };
 
     /*用户-删除*/
     function member_del(obj, id) {
@@ -169,7 +159,6 @@
                 data: {"id": id},
                 success: function (data) {
                     console.log(data);
-                    layer.msg('已删除!', {icon: 1, time: 1000});
                     xadmin.close();
                     // 可以对父窗口进行刷新
                     xadmin.father_reload();
@@ -196,23 +185,23 @@
     }
 
 
-    function delAll(argument) {
-        var ids = [];
+    {% comment %} function delAll(argument) {
+         var ids = [];
 
-        // 获取选中的id 
-        $('tbody input').each(function (index, el) {
-            if ($(this).prop('checked')) {
-                ids.push($(this).val())
-            }
+         // 获取选中的id
+         $('tbody input').each(function (index, el) {
+             if ($(this).prop('checked')) {
+                 ids.push($(this).val())
+             }
 
-        });
+         });
 
-        layer.confirm('确认要删除吗？' + ids.toString(), function (index) {
-            //捉到所有被选中的，发异步进行删除
-            layer.msg('删除成功', {icon: 1});
-            $(".layui-form-checked").not('.header').parents('tr').remove();
-            console.log(ids);
-        });
-    }
+         layer.confirm('确认要删除吗？' + ids.toString(), function (index) {
+             //捉到所有被选中的，发异步进行删除
+             layer.msg('删除成功', {icon: 1});
+             $(".layui-form-checked").not('.header').parents('tr').remove();
+             console.log(ids);
+         });
+     }{% endcomment %}
 </script>
 </html>
